@@ -22,20 +22,19 @@ public class Alternatives {
      */
     protected double[] weightsFinal;
     
-    public Alternatives(int nrAlternatives, int nrCriterion, double[] weightsFinal){
-    	this.nrAlternatives = nrAlternatives;
-    	this.nrCriterion = nrCriterion;
-    	this.tableCriterion = new TableCriterion[nrCriterion];
+    public void buildAndCompute(String[] labelsAlternatives, double[][] compArray, double[] weightsFinal) {
+    	
+    	this.nrAlternatives = labelsAlternatives.length;
+    	this.nrCriterion = weightsFinal.length;
+    	this.tableCriterion = new TableCriterion[this.nrCriterion];
     	this.weightsFinal = weightsFinal;
-    }
-    
-    public void buildAndCompute(String[] labelsAlternatives, double[][] compArray) {
+    	
     	int i,j;
     	
     	for (i = 0; i < this.nrCriterion; i++) {
     		this.tableCriterion[i] = new TableCriterion();
     		System.out.println("------------------------------------------------");
-    		this.tableCriterion[i].Compute(this.nrAlternatives, labelsAlternatives, compArray[i]);
+    		this.tableCriterion[i].Compute(labelsAlternatives, compArray[i]);
     	}
     	
     	double[] priorityWeightsFinal = new double[this.nrAlternatives];

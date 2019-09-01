@@ -5,3 +5,6 @@
     Opção 1: 
          Relacionar uma máquina virtual x com uma máquina virtual y e estabelecer que a prioridade
          será dada pela que tiver menor consumo de energia, por exemplo. Como quantificar? Proporcionalidade. 
+
+Essa semana: Organizar melhor o código - Design Patterns
+             Pensar/pesquisar como "setar" os pesos - proporcionalidade? - Alternativas 

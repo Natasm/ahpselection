@@ -177,7 +177,7 @@ public class AHP {
         return sb.toString();
     }
     
-    public AHP Calculate(AHP ahp, int nrVx, String[] labels) {
+    public AHP Calculate(AHP ahp, String[] labels) {
 
         for (int i = 0; i < ahp.getNrOfPairwiseComparisons(); i++) {
             System.out.print("Importance of " + labels[ahp.getIndicesForPairwiseComparison(i)[0]] + " compared to ");

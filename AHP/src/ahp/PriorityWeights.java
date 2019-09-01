@@ -2,80 +2,50 @@ package ahp;
 
 public class PriorityWeights {
 	
-	public double[] buildPriorityWeights() {
+	private TableCriterion tableCriterion;
+	private TableCriterion tableSubCriterion[];
+	
+	public double[] buildPriorityWeights(String labelsCriterion[], double[] compArrayCriterion, String labelsSubCriterion[][], 
+			                             double compArraySubCriterion[][]) {
+		
+	    if(labelsCriterion == null || compArrayCriterion == null || labelsSubCriterion == null||compArraySubCriterion == null) return null;
 		
 		/**
 	     * Table Criterion
 	     */
 		
-		TableCriterion tableCriterion = new TableCriterion();
-			
-		String labelsCriterion[] = { "Comprometimento ", "Financeiro      ", "Estratégicos    ", "Outros critérios" };
-		double compArrayCriterion[] = {1.0 / 5.0, 1.0 / 9.0 ,1 ,1 ,5 ,5};
-			
-		tableCriterion.Compute(4, labelsCriterion, compArrayCriterion);
+		this.tableCriterion = new TableCriterion();
+		this.tableCriterion.Compute(labelsCriterion, compArrayCriterion);
 			
 
 		/**
 	     * Array of subcriterion
 	     */
 	         
-		TableCriterion tableSubCriterion[] = new TableCriterion[4];
+		this.tableSubCriterion = new TableCriterion[labelsSubCriterion.length];
 	
 		
 		/**
-	     * Subcriterion 0
+	     * Subcriterions
 	     */
-	   
-		tableSubCriterion[0] = new TableCriterion();
-
-		String labelsSubCriterion1[] = { "Comprometimento do Time ", "Comprometimento da Organização",
-					"Comprometimento do Gerente do Projeto" };
-	    double compArray1[] = {3.0 , 1.0 / 5.0, 1.0 / 9.0};
-			
-	    tableSubCriterion[0].Compute(3, labelsSubCriterion1, compArray1);
-	    
-	    /**
-	     * Subcriterion 1
-	     */
-
-	    tableSubCriterion[1] = new TableCriterion();
-
-		String labelsSubCriterion2[] = { "Retorno de Investimento", "Lucro", "Valor Presente Líquido" };
-		double compArray2[] = {1.0 / 5.0, 1.0 / 5.0, 1.0};
-			
-		tableSubCriterion[1].Compute(3, labelsSubCriterion2, compArray2);
-
-		/**
-	     * Subcriterion 2
-	     */
-
-	    tableSubCriterion[2] = new TableCriterion();
-			
-		String labelsSubCriterion3[] = { "Competir em Mercados Internacionais", "Processos Internos", "Reputação" };
-		double compArray3[] = {7.0, 3.0, 1.0 / 5.0};
-
-		tableSubCriterion[2].Compute(3, labelsSubCriterion3, compArray3);
-
-		/**
-	     * Subcriterion 3
-	     */
-
-	    tableSubCriterion[3] = new TableCriterion();
-
-	    String labelsSubCriterion4[] = { "Reduz o Risco para a Organização", "Urgência", "Conhecimento Técnico Interno"};
-	    double compArray4[] = {5.0, 1.0 / 3.0, 1.0 / 7.0};
-			
-	    tableSubCriterion[3].Compute(3, labelsSubCriterion4, compArray4);
+		
+		int i,j;
+		for (i = 0; i < labelsSubCriterion.length; i++) {
+			this.tableSubCriterion[i] = new TableCriterion();
+			this.tableSubCriterion[i].Compute(labelsSubCriterion[i], compArraySubCriterion[i]);
+		}
 			
 	    
 	    /**
 	     * Calculate final weights
 	     */
+		int count = 0;
+		for (i = 0; i < labelsSubCriterion.length; i++)
+			for (j = 0; j < labelsSubCriterion[i].length; j++) count++;
+	    double weightsFinal[] = new double[count];
 			
-	    double weightsFinal[] = new double[12];
-			
-		int i = 0, j = 0;
+		i = 0;
+		j = 0;
 		for (double weightsCriterion: tableCriterion.getWeights()) {
 			for (double weightsSubCriterion: tableSubCriterion[i].getWeights()) {
 				weightsFinal[j] = weightsCriterion * weightsSubCriterion;

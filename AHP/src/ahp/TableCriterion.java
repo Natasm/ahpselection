@@ -7,8 +7,8 @@ public class TableCriterion {
      */
 	private AHP ahpCriterion;
 	
-	public AHP Compute(int nrVx, String[] labelsCriterion, double compArray[]) {
-		this.ahpCriterion = new AHP(nrVx);
+	public AHP Compute(String[] labelsCriterion, double compArray[]) {
+		this.ahpCriterion = new AHP(labelsCriterion.length);
 		
 		double compArrayCriterion[] = this.ahpCriterion.getPairwiseComparisonArray();
 		
@@ -20,7 +20,7 @@ public class TableCriterion {
 		
 		this.ahpCriterion.setPairwiseComparisonArray(compArrayCriterion);
 
-		this.ahpCriterion = this.ahpCriterion.Calculate(this.ahpCriterion, nrVx, labelsCriterion);
+		this.ahpCriterion = this.ahpCriterion.Calculate(this.ahpCriterion, labelsCriterion);
 		
 		return ahpCriterion;
 	}
