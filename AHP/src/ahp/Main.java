@@ -12,6 +12,7 @@ public class Main {
 				{ "Retorno de Investimento", "Lucro", "Valor Presente Líquido" },
 				{ "Competir em Mercados Internacionais", "Processos Internos", "Reputação" },
 				{ "Reduz o Risco para a Organização", "Urgência", "Conhecimento Técnico Interno"}
+				
 		};
 		
 		double compArraySubCriterion[][] = {
@@ -25,7 +26,7 @@ public class Main {
 		
 		double[] weightsFinal = pw.buildPriorityWeights(labelsCriterion, compArrayCriterion, labelsSubCriterion, compArraySubCriterion);
 		
-		Alternatives alternatives = new Alternatives();
+		/*________________________________________________________________________________________________________________________*/
 		
 		String[] labelsAlternatives = { "Novo escritorio", "Sistema ERP", "Escritorio na China",
 				                        "Produto Internacional", "Terceirizacao TI", 
@@ -58,6 +59,8 @@ public class Main {
 				                
 				                				 
 				               };
+		
+		Alternatives alternatives = new Alternatives();
 		
 		alternatives.buildAndCompute(labelsAlternatives, compArray, weightsFinal);
 	}
