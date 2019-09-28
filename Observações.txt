@@ -1,3 +1,5 @@
+------------------------------------------------ AGOSTO -----------------------------------------------------------
+
 1 - Os pesos para critérios e subcritérios serão fixos. 
     Fixo: Classe calcula e retorna o array de prioridades de criterios/subcriterios finais.
 
@@ -7,4 +9,14 @@
          será dada pela que tiver menor consumo de energia, por exemplo. Como quantificar? Proporcionalidade. 
 
 Essa semana: Organizar melhor o código - Design Patterns
-             Pensar/pesquisar como "setar" os pesos - proporcionalidade? - Alternativas 
+             Pensar/pesquisar como "setar" os pesos - proporcionalidade? - Alternativas
+
+----------------------------------------------- SETEMBRO -----------------------------------------------------------
+
+No classifier não é considerado as diferenças entre grandezas...
+
+Exemplo: Suponha uma VM X - 1000 MIPS e uma VM Y - 2000 MIPS. 
+
+No classifier proposto a relação X -> Y na ponderação foi de 6.0. 
+Mas, na verdade era pra ser 1.0 / 6.0 , dado que X tem menor consumo de MIPS relacionado a Y.
+ -- FOI MODIFICADO - MOSTRAR NO CÓDIGO

@@ -20,15 +20,13 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 
 		if (migratableVms.isEmpty()) return null;
 		
-		System.out.println("Passei");
-		
 		return choiceVm(host, migratableVms, getCriterionAndSubCriterionWeights());
 	}
 
 	public double[] getCriterionAndSubCriterionWeights() {
-
-		String labelsCriterion[] = { "MIPS", "Ram", "Tamanho" };
-		double compArrayCriterion[] = { 7, 8, 1.0 / 5.0 };
+		
+		String labelsCriterion[] = { "MIPS", "Ram"}; //Foco no "MIPS" e no "Tamanho" 
+		double compArrayCriterion[] = { 7 };
 
 		TableCriterion tableCriterion = new TableCriterion();
 		return tableCriterion.Compute(labelsCriterion, compArrayCriterion).getWeights();
@@ -59,20 +57,39 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 		int j = 0;
 		
 		if (i == 0) {
+			
+			//PRINT - updated
+			System.out.println("\n\nCritério de MIPS" + "\n" + "Host: " + host.getTotalMips() + "\n");
+			
+			//Printar a quantidade de MIPS de x e y - updated
+			for (x = 0; x < migratableVms.size(); x++) {
+				System.out.println("VM " + x + " : " + migratableVms.get(x).getMips());
+			}
+			
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
-					compArrayVms[i][j] = classifier(migratableVms.get(x).getMips(), migratableVms.get(y).getMips(), host.getTotalMips());
+					//updated
+					/*Seção de modificação*/
+					double classfied = classifier(migratableVms.get(x).getMips(), migratableVms.get(y).getMips(), host.getTotalMips());
+					if (migratableVms.get(x).getMips() < migratableVms.get(y).getMips()) compArrayVms[i][j] = 1 / classfied;
+					else compArrayVms[i][j] = classfied;
+					/*Térmico da seção de modificação*/
 					j++;
 				}
 		}
 		if (i == 1) {
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
-					compArrayVms[i][j] = classifier(migratableVms.get(x).getRam(), migratableVms.get(y).getRam(), host.getRam());
+					//updated
+					/*Seção de modificação*/
+					double classfied = classifier(migratableVms.get(x).getRam(), migratableVms.get(y).getRam(), host.getRam());
+					if (migratableVms.get(x).getRam() < migratableVms.get(y).getRam()) compArrayVms[i][j] = 1 / classfied;
+					else compArrayVms[i][j] = classfied;
+					/*Térmico da seção de modificação*/
 					j++;
 				}
 		}
-		if (i == 2){
+		if (i == 2){ //Peso fixo para o tamanho - Classifier será estático - Os pesos(conversar com a Lisieux)
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
 					compArrayVms[i][j] = classifier(migratableVms.get(x).getSize(), migratableVms.get(y).getSize(), host.getStorage());
@@ -80,6 +97,8 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 				}
 		}
 	}
+	
+	//Mandar arquivo de LOG para o professor
 	
 	public int classifier(double x, double y, double maxCapacityHost) {
 
