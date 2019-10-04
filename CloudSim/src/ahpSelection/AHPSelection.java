@@ -1,5 +1,6 @@
 package ahpSelection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.math3.util.CombinatoricsUtils;
@@ -9,98 +10,107 @@ import org.cloudbus.cloudsim.power.PowerVm;
 import org.cloudbus.cloudsim.power.PowerVmSelectionPolicy;
 
 import ahp.Alternatives;
-import ahp.TableCriterion;
+import ahp.PriorityWeights;
 
 public class AHPSelection extends PowerVmSelectionPolicy {
 
 	@Override
 	public Vm getVmToMigrate(PowerHost host) {
-
 		List<PowerVm> migratableVms = getMigratableVms(host);
 
-		if (migratableVms.isEmpty()) return null;
-		
-		return choiceVm(host, migratableVms, getCriterionAndSubCriterionWeights());
+		if (migratableVms.isEmpty())
+			return null;
+
+		Vm vmChoice = choiceVm(host, migratableVms, getCriterionAndSubCriterionWeights());
+
+		return vmChoice;
 	}
 
-	public double[] getCriterionAndSubCriterionWeights() {
-		
-		String labelsCriterion[] = { "MIPS", "Ram"}; //Foco no "MIPS" e no "Tamanho" 
-		double compArrayCriterion[] = { 7 };
+	public ArrayList<Double> getCriterionAndSubCriterionWeights() {
 
-		TableCriterion tableCriterion = new TableCriterion();
-		return tableCriterion.Compute(labelsCriterion, compArrayCriterion).getWeights();
+		String labelsCriterion[] = { "Desempenho" };
+		double compArrayCriterion[] = {  };
+
+		String labelsSubCriterion[][] = { { "MIPS", "RAM" } };
+		double compArraySubCriterion[][] = { { 7 } };
+
+		PriorityWeights priorityWeights = new PriorityWeights();
+		return priorityWeights.buildPriorityWeights(labelsCriterion, compArrayCriterion, labelsSubCriterion,
+				compArraySubCriterion);
 	}
-	
-	public Vm choiceVm(PowerHost host, List<PowerVm> migratableVms, double[] weightsCriterionAndSub) {
+
+	public Vm choiceVm(PowerHost host, List<PowerVm> migratableVms, ArrayList<Double> weightsCriterionAndSub) {
 
 		Alternatives alternatives = new Alternatives();
 		String[] labelsVms = new String[migratableVms.size()];
-		double[][] compArrayVms = new double[weightsCriterionAndSub.length][(int) CombinatoricsUtils.binomialCoefficient(migratableVms.size(), 2)];
+		double[][] compArrayVms = new double[weightsCriterionAndSub
+				.size()][(int) CombinatoricsUtils.binomialCoefficient(migratableVms.size(), 2)];
 		int i;
 
 		for (i = 0; i < migratableVms.size(); i++) {
 			labelsVms[i] = "VM " + i;
 		}
 
-		for (i = 0; i < weightsCriterionAndSub.length; i++) {
+		for (i = 0; i < weightsCriterionAndSub.size(); i++) {
 			buildCompArrayAlternativeCriterion(host, migratableVms, compArrayVms, i);
 		}
 
-		double[] weightsFinalAlternative = alternatives.buildAndCompute(labelsVms, compArrayVms, weightsCriterionAndSub);
-		
+		ArrayList<Double> weightsFinalAlternative = alternatives.buildAndCompute(labelsVms, compArrayVms,
+				weightsCriterionAndSub);
+
 		return migratableVms.get(getIndexMaxPriority(weightsFinalAlternative));
 	}
 
-	public void buildCompArrayAlternativeCriterion(PowerHost host, List<PowerVm> migratableVms, double[][] compArrayVms, int i) {
+	public void buildCompArrayAlternativeCriterion(PowerHost host, List<PowerVm> migratableVms, double[][] compArrayVms,
+			int i) {
 		int x, y;
 		int j = 0;
-		
+
 		if (i == 0) {
-			
-			//PRINT - updated
+
+			// PRINT - updated
 			System.out.println("\n\nCritério de MIPS" + "\n" + "Host: " + host.getTotalMips() + "\n");
-			
-			//Printar a quantidade de MIPS de x e y - updated
+
+			// Printar a quantidade de MIPS de x e y - updated
 			for (x = 0; x < migratableVms.size(); x++) {
 				System.out.println("VM " + x + " : " + migratableVms.get(x).getMips());
 			}
-			
+
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
-					//updated
-					/*Seção de modificação*/
-					double classfied = classifier(migratableVms.get(x).getMips(), migratableVms.get(y).getMips(), host.getTotalMips());
-					if (migratableVms.get(x).getMips() < migratableVms.get(y).getMips()) compArrayVms[i][j] = 1 / classfied;
-					else compArrayVms[i][j] = classfied;
-					/*Térmico da seção de modificação*/
+					compArrayVms[i][j] = classifier(migratableVms.get(x).getMips(), migratableVms.get(y).getMips(),
+							host.getTotalMips());
 					j++;
 				}
 		}
 		if (i == 1) {
+
+			// PRINT - updated
+			System.out.println("\n\nCritério de RAM" + "\n" + "Host: " + host.getRam() + "\n");
+
+			// Printar a quantidade de MIPS de x e y - updated
+			for (x = 0; x < migratableVms.size(); x++) {
+				System.out.println("VM " + x + " : " + migratableVms.get(x).getRam());
+			}
+
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
-					//updated
-					/*Seção de modificação*/
-					double classfied = classifier(migratableVms.get(x).getRam(), migratableVms.get(y).getRam(), host.getRam());
-					if (migratableVms.get(x).getRam() < migratableVms.get(y).getRam()) compArrayVms[i][j] = 1 / classfied;
-					else compArrayVms[i][j] = classfied;
-					/*Térmico da seção de modificação*/
-					j++;
-				}
-		}
-		if (i == 2){ //Peso fixo para o tamanho - Classifier será estático - Os pesos(conversar com a Lisieux)
-			for (x = 0; x < migratableVms.size(); x++)
-				for (y = x + 1; y < migratableVms.size(); y++) {
-					compArrayVms[i][j] = classifier(migratableVms.get(x).getSize(), migratableVms.get(y).getSize(), host.getStorage());
+					compArrayVms[i][j] = classifier(migratableVms.get(x).getRam(), migratableVms.get(y).getRam(),
+							host.getRam());
 					j++;
 				}
 		}
 	}
-	
-	//Mandar arquivo de LOG para o professor
-	
-	public int classifier(double x, double y, double maxCapacityHost) {
+
+	public double classifier(double x, double y, double maxCapacityHost) {
+		double classifier = classifierMin(x, y, maxCapacityHost);
+		if (x < y)
+			return 1 / classifier;
+		else
+			return classifier;
+	}
+
+	public double classifierMin(double x, double y, double maxCapacityHost) {
 
 		double res = x + y + maxCapacityHost;
 		int i;
@@ -116,11 +126,12 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 		}
 		return 1;
 	}
-	
-	public int getIndexMaxPriority(double[] weightsFinalAlternative) {
+
+	public int getIndexMaxPriority(ArrayList<Double> weightsFinalAlternative) {
 		int index = 0;
-		for (int i = 1; i < weightsFinalAlternative.length; i++)
-			if (weightsFinalAlternative[i] > weightsFinalAlternative[index]) index = i;
+		for (int i = 1; i < weightsFinalAlternative.size(); i++)
+			if (weightsFinalAlternative.get(i) > weightsFinalAlternative.get(index))
+				index = i;
 		return index;
 	}
 }

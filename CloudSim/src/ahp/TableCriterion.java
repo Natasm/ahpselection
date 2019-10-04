@@ -1,5 +1,7 @@
 package ahp;
 
+import java.util.ArrayList;
+
 public class TableCriterion {
 	
 	/**
@@ -25,8 +27,10 @@ public class TableCriterion {
 		return ahpCriterion;
 	}
 	
-	public double[] getWeights() {
+	public ArrayList<Double> getWeights() {
 		if (ahpCriterion == null) return null;
-		return ahpCriterion.getWeights();
+		ArrayList<Double> arr = new ArrayList<Double>();
+		for (double d: ahpCriterion.getWeights()) arr.add(d);
+		return arr;
 	}
 }

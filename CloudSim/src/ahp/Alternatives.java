@@ -1,5 +1,7 @@
 package ahp;
 
+import java.util.ArrayList;
+
 public class Alternatives {
 	
 	/**
@@ -15,40 +17,41 @@ public class Alternatives {
     /**
      * Array of criteria tables
      */
-    protected TableCriterion tableCriterion[];
+    protected ArrayList<TableCriterion> tableCriterion;
     
     /**
      * Array of criteria tables
      */
-    protected double[] weightsFinal;
+    protected ArrayList<Double> weightsFinal;
     
-    public double[] buildAndCompute(String[] labelsAlternatives, double[][] compArray, double[] weightsFinal) {
+    public ArrayList<Double> buildAndCompute(String[] labelsAlternatives, double[][] compArray, ArrayList<Double> weightsFinal) {
     	
     	this.nrAlternatives = labelsAlternatives.length;
-    	this.nrCriterion = weightsFinal.length;
-    	this.tableCriterion = new TableCriterion[this.nrCriterion];
+    	this.nrCriterion = weightsFinal.size();
+    	this.tableCriterion = new ArrayList<TableCriterion>();
     	this.weightsFinal = weightsFinal;
     	
     	int i,j;
     	
     	for (i = 0; i < this.nrCriterion; i++) {
-    		this.tableCriterion[i] = new TableCriterion();
     		System.out.println("------------------------------------------------");
-    		this.tableCriterion[i].Compute(labelsAlternatives, compArray[i]);
+    		TableCriterion tableCriterionObj = new TableCriterion();
+    		tableCriterionObj.Compute(labelsAlternatives, compArray[i]);
+    		tableCriterion.add(tableCriterionObj);
     	}
     	
-    	double[] priorityWeightsFinal = new double[this.nrAlternatives];
+    	ArrayList<Double> priorityWeightsFinal = new ArrayList<Double>();
     	
     	System.out.println("\nFinal priority");
     	
     	for (i = 0; i < this.nrAlternatives; i++) {
     		double soma = 0;
     		for (j = 0; j < this.nrCriterion; j++) {
-    			soma = soma + (this.tableCriterion[j].getWeights()[i] * this.weightsFinal[j]);
+    			soma = soma + (tableCriterion.get(j).getWeights().get(i) * this.weightsFinal.get(j));
     		}
-    		priorityWeightsFinal[i] = soma;
+    		priorityWeightsFinal.add(soma);
 
-    		System.out.println(labelsAlternatives[i] + " : " + priorityWeightsFinal[i] * 100);
+    		System.out.println(labelsAlternatives[i] + " : " + priorityWeightsFinal.get(i) * 100);
     	}
     	
     	return priorityWeightsFinal;
