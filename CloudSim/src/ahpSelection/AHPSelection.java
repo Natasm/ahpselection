@@ -16,6 +16,9 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 
 	@Override
 	public Vm getVmToMigrate(PowerHost host) {
+		
+		System.out.print("\n\n------------------------- Nova Seleção ---------------------------------\n\n");
+		
 		List<PowerVm> migratableVms = getMigratableVms(host);
 
 		if (migratableVms.isEmpty())
@@ -28,8 +31,8 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 
 	public ArrayList<Double> getCriterionAndSubCriterionWeights() {
 
-		String labelsCriterion[] = { "Desempenho" };
-		double compArrayCriterion[] = {  };
+		String labelsCriterion[] = { "Desempenho" , "Energia" };
+		double compArrayCriterion[] = { 7 };
 
 		String labelsSubCriterion[][] = { { "MIPS", "RAM" } };
 		double compArraySubCriterion[][] = { { 7 } };
@@ -97,6 +100,24 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 				for (y = x + 1; y < migratableVms.size(); y++) {
 					compArrayVms[i][j] = classifier(migratableVms.get(x).getRam(), migratableVms.get(y).getRam(),
 							host.getRam());
+					j++;
+				}
+		}
+		if (i == 2) {
+
+			// PRINT - updated
+			System.out.println("\n\nCritério de Energia" + "\n" + "Host: " + host.getPower() + "\n");
+
+			// Printar a quantidade de MIPS de x e y - updated
+			for (x = 0; x < migratableVms.size(); x++) {
+				System.out.println("VM " + x + " : " + migratableVms.get(x).getCurrentRequestedMaxMips() / host.getPower());
+			}
+
+			for (x = 0; x < migratableVms.size(); x++)
+				for (y = x + 1; y < migratableVms.size(); y++) {
+					compArrayVms[i][j] = classifier(migratableVms.get(x).getCurrentRequestedMaxMips() / host.getPower()
+							                        ,migratableVms.get(y).getCurrentRequestedMaxMips() / host.getPower(),
+							                        host.getPower());
 					j++;
 				}
 		}

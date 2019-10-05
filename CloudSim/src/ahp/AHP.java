@@ -181,7 +181,7 @@ public class AHP {
     public AHP Calculate(AHP ahp, String[] labels) {
 
         for (int i = 0; i < ahp.getNrOfPairwiseComparisons(); i++) {
-            System.out.print("Importance of " + labels[ahp.getIndicesForPairwiseComparison(i)[0]] + " compared to ");
+            System.out.print("\nImportance of " + labels[ahp.getIndicesForPairwiseComparison(i)[0]] + " compared to ");
             System.out.print(labels[ahp.getIndicesForPairwiseComparison(i)[1]] + "= ");
             System.out.println(ahp.getPairwiseComparisonArray()[i]);
         }
