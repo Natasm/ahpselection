@@ -1,8 +1,11 @@
 package ahp;
 
+import java.util.ArrayList;
+
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.stat.descriptive.moment.GeometricMean;
 
 public class AHP {
 	
@@ -29,7 +32,7 @@ public class AHP {
     /**
      * The resulting weights/priorities
      */
-    protected double weights[];
+    protected ArrayList<Double> weights;
 
     /**
      * Corresponds to the weights
@@ -68,7 +71,7 @@ public class AHP {
     public AHP(int nrAlternatives) {
         this.nrAlternatives = nrAlternatives;
         mtx = new Array2DRowRealMatrix(nrAlternatives, nrAlternatives);
-        weights = new double[nrAlternatives];
+        weights = new ArrayList<Double>();
 
         pairwiseComparisonArray = new double[getNrOfPairwiseComparisons()];
         comparisonIndices = new int[getNrOfPairwiseComparisons()][];
@@ -116,7 +119,22 @@ public class AHP {
                 i++;
             }
         }
+       
+        GeometricMean geometricMean = new GeometricMean();
+        ArrayList<Double> weightsAux = new ArrayList<>();
+        for(int row = 0; row < mtx.getRowDimension(); row++) {
+        	geometricMean.clear();
+        	weightsAux.add(geometricMean.evaluate(mtx.getRow(row)));
+        }
+		
+        for (double d: weightsAux){
+        	this.weights.add(d / sum(weightsAux));
+        }
+        
+        /*System.out.println(mtx);
+        System.out.println("Entrei");
         evd = new EigenDecomposition(mtx);
+        System.out.println("Passei");
 
         evIdx = 0;
         for (int k = 0; k < evd.getRealEigenvalues().length; k++) {
@@ -134,7 +152,13 @@ public class AHP {
         //System.out.println(sum);
         for (int k = 0; k < v.getDimension(); k++) {
             weights[k] = v.getEntry(k) / sum;
-        }
+        }*/
+    }
+    
+    private double sum(ArrayList<Double> doubleArray) {
+    	double sum = 0;
+    	for(double d: doubleArray) sum = sum + d;
+    	return sum;
     }
 
     /**
@@ -150,7 +174,7 @@ public class AHP {
      *
      * @return resulting weights for alternatives
      */
-    public double[] getWeights() {
+    public ArrayList<Double> getWeights() {
         return weights;
     }
 
@@ -179,14 +203,14 @@ public class AHP {
     }
     
     public AHP Calculate(AHP ahp, String[] labels) {
-
-        for (int i = 0; i < ahp.getNrOfPairwiseComparisons(); i++) {
+            
+        // System.out.println("\n" + ahp + "\n");
+        
+        /*for (int i = 0; i < ahp.getNrOfPairwiseComparisons(); i++) {
             System.out.print("\nImportance of " + labels[ahp.getIndicesForPairwiseComparison(i)[0]] + " compared to ");
             System.out.print(labels[ahp.getIndicesForPairwiseComparison(i)[1]] + "= ");
             System.out.println(ahp.getPairwiseComparisonArray()[i]);
         }
-        
-        System.out.println("\n" + ahp + "\n");
 
         System.out.println("Consistency Index: " + ahp.getConsistencyIndex());
         System.out.println("Consistency Ratio: " + ahp.getConsistencyRatio() + "%");
@@ -194,7 +218,7 @@ public class AHP {
         System.out.println("Weights: ");
         for (int k=0; k<ahp.getWeights().length; k++) {
             System.out.println(labels[k] + ": " + ahp.getWeights()[k] * 100);
-        }
+        }*/
         return ahp;
     }
 }

@@ -49,6 +49,7 @@ public class Main {
 				vmAllocationPolicy,
 				vmSelectionPolicy,
 				parameter);
+		 
 	}
 
 }

@@ -1,11 +1,12 @@
 package ahp;
 
+import java.util.ArrayList;
 
 public class Main {
 
 	public static void main(String argv[]) {
 		
-		/*String labelsCriterion[] = { "Comprometimento ", "Financeiro      ", "Estratégicos    ", "Outros critérios" };
+		String labelsCriterion[] = { "Comprometimento ", "Financeiro      ", "Estratégicos    ", "Outros critérios" };
 		double compArrayCriterion[] = {1.0 / 5.0, 1.0 / 9.0 ,1 ,1 ,5 ,5};
 	
 		String labelsSubCriterion[][] = {
@@ -25,11 +26,11 @@ public class Main {
 		
 		PriorityWeights pw = new PriorityWeights();
 		
-		double[] weightsFinal = pw.buildPriorityWeights(labelsCriterion, compArrayCriterion,null, null);
+		ArrayList<Double> weightsFinal = pw.buildPriorityWeights(labelsCriterion, compArrayCriterion, labelsSubCriterion, compArraySubCriterion);
 		
 		/*________________________________________________________________________________________________________________________*/
 		
-		/*String[] labelsAlternatives = { "Novo escritorio", "Sistema ERP", "Escritorio na China",
+		String[] labelsAlternatives = { "Novo escritorio", "Sistema ERP", "Escritorio na China",
 				                        "Produto Internacional", "Terceirizacao TI", 
 				                        "Marketing Local"};
 		
@@ -63,6 +64,6 @@ public class Main {
 		
 		Alternatives alternatives = new Alternatives();
 		
-		alternatives.buildAndCompute(labelsAlternatives, compArray, weightsFinal);*/
+		alternatives.buildAndCompute(labelsAlternatives, compArray, weightsFinal);
 	}
 }

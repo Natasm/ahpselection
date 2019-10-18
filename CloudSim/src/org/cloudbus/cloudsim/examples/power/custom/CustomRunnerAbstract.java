@@ -195,6 +195,7 @@ Log.setDisabled(true);//LOGOFF
 
 			CloudSim.stopSimulation();
 Log.setDisabled(true);//LOGON
+
 			Helper.printResults(
 					datacenter,
 					vmList,

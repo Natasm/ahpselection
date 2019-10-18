@@ -56,7 +56,7 @@ public class PriorityWeights {
 			else weightsFinal.add(weightsCriterion);
 			i++;
 		}
-			
+		
 		return weightsFinal;
 	}
 }

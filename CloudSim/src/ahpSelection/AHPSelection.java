@@ -17,12 +17,11 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 	@Override
 	public Vm getVmToMigrate(PowerHost host) {
 		
-		System.out.print("\n\n------------------------- Nova Seleção ---------------------------------\n\n");
+		//System.out.print("\n\n------------------------- Nova Seleção ---------------------------------\n\n");
 		
 		List<PowerVm> migratableVms = getMigratableVms(host);
-
-		if (migratableVms.isEmpty())
-			return null;
+        
+		if (migratableVms.isEmpty()) return null;
 
 		Vm vmChoice = choiceVm(host, migratableVms, getCriterionAndSubCriterionWeights());
 
@@ -30,12 +29,12 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 	}
 
 	public ArrayList<Double> getCriterionAndSubCriterionWeights() {
+		
+	    String labelsCriterion[] = { "Desempenho "};
+		double compArrayCriterion[] = {  };
 
-		String labelsCriterion[] = { "Desempenho" , "Energia" };
-		double compArrayCriterion[] = { 7 };
-
-		String labelsSubCriterion[][] = { { "MIPS", "RAM" } };
-		double compArraySubCriterion[][] = { { 7 } };
+		String labelsSubCriterion[][] = { { "MIPS" , "RAM" } };
+		double compArraySubCriterion[][] = { { 9.0 } };
 
 		PriorityWeights priorityWeights = new PriorityWeights();
 		return priorityWeights.buildPriorityWeights(labelsCriterion, compArrayCriterion, labelsSubCriterion,
@@ -46,78 +45,98 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 
 		Alternatives alternatives = new Alternatives();
 		String[] labelsVms = new String[migratableVms.size()];
-		double[][] compArrayVms = new double[weightsCriterionAndSub
-				.size()][(int) CombinatoricsUtils.binomialCoefficient(migratableVms.size(), 2)];
+		double[][] compArrayVms = new double[weightsCriterionAndSub.size()][(int) CombinatoricsUtils.binomialCoefficient(migratableVms.size(), 2)];
 		int i;
 
 		for (i = 0; i < migratableVms.size(); i++) {
 			labelsVms[i] = "VM " + i;
 		}
-
+		
 		for (i = 0; i < weightsCriterionAndSub.size(); i++) {
 			buildCompArrayAlternativeCriterion(host, migratableVms, compArrayVms, i);
 		}
-
-		ArrayList<Double> weightsFinalAlternative = alternatives.buildAndCompute(labelsVms, compArrayVms,
-				weightsCriterionAndSub);
-
+		
+		ArrayList<Double> weightsFinalAlternative = alternatives.buildAndCompute(labelsVms, compArrayVms, weightsCriterionAndSub);
+		
 		return migratableVms.get(getIndexMaxPriority(weightsFinalAlternative));
 	}
 
-	public void buildCompArrayAlternativeCriterion(PowerHost host, List<PowerVm> migratableVms, double[][] compArrayVms,
-			int i) {
+	public void buildCompArrayAlternativeCriterion(PowerHost host, List<PowerVm> migratableVms, double[][] compArrayVms, int i) {
 		int x, y;
 		int j = 0;
 
 		if (i == 0) {
 
 			// PRINT - updated
-			System.out.println("\n\nCritério de MIPS" + "\n" + "Host: " + host.getTotalMips() + "\n");
+			//System.out.println("\n\nCritério de MIPS" + "\n" + "Host: " + host.getTotalMips() + "\n");
 
 			// Printar a quantidade de MIPS de x e y - updated
-			for (x = 0; x < migratableVms.size(); x++) {
+			/*for (x = 0; x < migratableVms.size(); x++) {
 				System.out.println("VM " + x + " : " + migratableVms.get(x).getMips());
-			}
+			}*/
 
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
-					compArrayVms[i][j] = classifier(migratableVms.get(x).getMips(), migratableVms.get(y).getMips(),
-							host.getTotalMips());
+					compArrayVms[i][j] = classifier(migratableVms.get(x).getMips(), 
+							                        migratableVms.get(y).getMips(),
+							                        host.getTotalMips());
 					j++;
 				}
 		}
 		if (i == 1) {
 
 			// PRINT - updated
-			System.out.println("\n\nCritério de RAM" + "\n" + "Host: " + host.getRam() + "\n");
+			//System.out.println("\n\nCritério de Energia" + "\n" + "Host: " + host.getPower() + "\n");
 
 			// Printar a quantidade de MIPS de x e y - updated
-			for (x = 0; x < migratableVms.size(); x++) {
-				System.out.println("VM " + x + " : " + migratableVms.get(x).getRam());
-			}
+			/*for (x = 0; x < migratableVms.size(); x++) {
+				System.out.println("VM " + x + " : " + migratableVms.get(x).getCurrentRequestedMaxMips() / host.getPower());
+			}*/
+			
 
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
-					compArrayVms[i][j] = classifier(migratableVms.get(x).getRam(), migratableVms.get(y).getRam(),
-							host.getRam());
+					compArrayVms[i][j] = classifier(migratableVms.get(x).getRam(),
+							                        migratableVms.get(y).getRam(),
+							                        host.getRam());
 					j++;
 				}
 		}
 		if (i == 2) {
 
 			// PRINT - updated
-			System.out.println("\n\nCritério de Energia" + "\n" + "Host: " + host.getPower() + "\n");
+			//System.out.println("\n\nCritério de Energia" + "\n" + "Host: " + host.getPower() + "\n");
 
 			// Printar a quantidade de MIPS de x e y - updated
-			for (x = 0; x < migratableVms.size(); x++) {
+			/*for (x = 0; x < migratableVms.size(); x++) {
 				System.out.println("VM " + x + " : " + migratableVms.get(x).getCurrentRequestedMaxMips() / host.getPower());
-			}
+			}*/
+			
 
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
-					compArrayVms[i][j] = classifier(migratableVms.get(x).getCurrentRequestedMaxMips() / host.getPower()
-							                        ,migratableVms.get(y).getCurrentRequestedMaxMips() / host.getPower(),
-							                        host.getPower());
+					compArrayVms[i][j] = classifier(migratableVms.get(x).getUtilizationMean(),
+							                        migratableVms.get(y).getUtilizationMean(),
+							                        host.getTotalMips());
+					j++;
+				}
+		}
+		if (i == 3) {
+
+			// PRINT - updated
+			//System.out.println("\n\nCritério de Energia" + "\n" + "Host: " + host.getPower() + "\n");
+
+			// Printar a quantidade de MIPS de x e y - updated
+			/*for (x = 0; x < migratableVms.size(); x++) {
+				System.out.println("VM " + x + " : " + migratableVms.get(x).getCurrentRequestedMaxMips() / host.getPower());
+			}*/
+			
+
+			for (x = 0; x < migratableVms.size(); x++)
+				for (y = x + 1; y < migratableVms.size(); y++) {
+					compArrayVms[i][j] = classifier(migratableVms.get(x).getUtilizationVariance(),
+							                        migratableVms.get(y).getUtilizationVariance(),
+							                        host.getTotalMips());
 					j++;
 				}
 		}

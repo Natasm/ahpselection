@@ -28,9 +28,6 @@ public class TableCriterion {
 	}
 	
 	public ArrayList<Double> getWeights() {
-		if (ahpCriterion == null) return null;
-		ArrayList<Double> arr = new ArrayList<Double>();
-		for (double d: ahpCriterion.getWeights()) arr.add(d);
-		return arr;
+		return this.ahpCriterion.getWeights();
 	}
 }
