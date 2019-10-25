@@ -34,7 +34,6 @@ import org.cloudbus.cloudsim.power.PowerVmSelectionPolicyMinimumMigrationTime;
 import org.cloudbus.cloudsim.power.PowerVmSelectionPolicyMinimumUtilization;
 import org.cloudbus.cloudsim.power.PowerVmSelectionPolicyRandomSelection;
 
-import SelectionPolicyTeste.SelectionPolicyTeste;
 import ahpSelection.AHPSelection;
 import shi.AbsoluteCapacity;
 import shi.PercentageUtil;
@@ -345,9 +344,7 @@ Log.setDisabled(true);//LOGON
 			vmSelectionPolicy = new PowerVmSelectionPolicyRandomSelection();
 		} else if (vmSelectionPolicyName.equals("ahpselection")) {
 			vmSelectionPolicy = new AHPSelection();
-		} else if (vmSelectionPolicyName.equals("selectionteste")) {
-		    vmSelectionPolicy = new SelectionPolicyTeste();
-	    } else {
+		} else {
 			System.out.println("Unknown VM selection policy: " + vmSelectionPolicyName);
 			System.exit(0);
 		}
