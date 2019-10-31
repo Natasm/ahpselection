@@ -21,7 +21,7 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 		
 		List<PowerVm> migratableVms = getMigratableVms(host);
         
-		if (migratableVms.isEmpty()) return null;
+		if (migratableVms.isEmpty() || migratableVms.size() <= 1) return null;
 
 		Vm vmChoice = choiceVm(host, migratableVms, getCriterionAndSubCriterionWeights());
 
@@ -30,11 +30,11 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 
 	public ArrayList<Double> getCriterionAndSubCriterionWeights() {
 		
-	    String labelsCriterion[] = { "Desempenho ", "Utilization " };
-		double compArrayCriterion[] = {  1.0 / 7.0  };
+	    String labelsCriterion[] = { "Desempenho" , "Utilização" };
+		double compArrayCriterion[] = { 1.0 / 7.0 };
 
-		String labelsSubCriterion[][] = { { "MIPS" , "RAM"}, { "Utilization MAX Mips", "Utilization Total Mips"} };
-		double compArraySubCriterion[][] = { { 7.0 } , { 8.0 } };
+		String labelsSubCriterion[][] = { { "MIPS ", "RAM" } , { "Utilização da CPU", "Utilização Máxima da CPU" } };
+		double compArraySubCriterion[][] = { { 7.0 } , { 1.0 / 6.0 } };
 
 		PriorityWeights priorityWeights = new PriorityWeights();
 		return priorityWeights.buildPriorityWeights(labelsCriterion, compArrayCriterion, labelsSubCriterion,
@@ -77,13 +77,26 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 		if (i == 1) {
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
-					compArrayVms[i][j] = classifier(migratableVms.get(x).getRam(),
+					compArrayVms[i][j] = classifier(migratableVms.get(x).getRam(), 
 							                        migratableVms.get(y).getRam(),
-							                        host.getRam());
+							                        host.getTotalMips());
 					j++;
 				}
 		}
-		if (i == 2) {
+		if (i == 2) 
+		{
+			for (x = 0; x < migratableVms.size(); x++)
+				for (y = x + 1; y < migratableVms.size(); y++) {
+					double timeX = migratableVms.get(x).getPreviousTime();
+					double timeY = migratableVms.get(y).getPreviousTime();
+					double utilizationX = migratableVms.get(x).getTotalUtilizationOfCpu(timeX);
+					double utilizationY = migratableVms.get(y).getTotalUtilizationOfCpu(timeY);
+					compArrayVms[i][j] = classifier(utilizationX, utilizationY, 1);
+					j++;
+				}
+		}
+		if (i == 3) 
+		{
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
 					compArrayVms[i][j] = classifier(migratableVms.get(x).getCurrentRequestedMaxMips(),
@@ -92,24 +105,14 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 					j++;
 				}
 		}
-		if (i == 3) {
-			
-			// PRINT - updated
-			//System.out.println("\n\nCritério de Energia" + "\n" + "Host: " + host.getPower() + "\n");
-
-			// Printar a quantidade de MIPS de x e y - updated
-			/*for (x = 0; x < migratableVms.size(); x++) {
-				System.out.println("VM " + x + " : " + migratableVms.get(x).);
-			}*/
-			
-			for (x = 0; x < migratableVms.size(); x++)
-				for (y = x + 1; y < migratableVms.size(); y++) {
-					compArrayVms[i][j] = classifier(migratableVms.get(x).getCurrentRequestedTotalMips(),
-							                        migratableVms.get(y).getCurrentRequestedTotalMips(),
-							                        host.getTotalMips());
-					j++;
-				}
-		}
+	}
+	
+	public double mean(List<Double> listDouble) {
+		if (listDouble.isEmpty()) return 0;
+		System.out.println("Mean => " + listDouble.size());
+		double sum = 0;
+		for (double d: listDouble) sum += d;
+		return sum / listDouble.size();
 	}
 
 	public double classifier(double x, double y, double maxCapacityHost) {

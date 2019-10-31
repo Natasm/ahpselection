@@ -1,0 +1,41 @@
+---------- GoogleCluster (Workload) ----------
+
+Política de Alocação: THR
+
+Políticas de Seleção: 
+
+Consumo de energia:
+- Random: 80,48 kWh
+- MinimumUtilization: 95,63 kWh
+- MinimumMigrationTime: 79,63 kWh
+- MaximumCorrelation: 79,75 kWh
+- AHPSelection: 74,70 kWh
+
+---------- BitBrains (Workload) ----------
+
+Política de Alocação: THR
+
+Políticas de Seleção: 
+
+Consumo de energia:
+- Random: 164,48 kWh
+- MinimumUtilization: 178,95 kWh
+- MinimumMigrationTime: 175,38 kWh
+- MaximumCorrelation: 175,14 kWh
+- AHPSelection: 152,51 kWh
+
+---------- PlanetLab (Workload) ----------
+
+Política de Alocação: THR
+
+Políticas de Seleção: 
+
+Consumo de energia:
+- Random: 183,57 kWh
+- MinimumUtilization: 206,73 kWh
+- MinimumMigrationTime: 191,73 kWh
+- MaximumCorrelation: 183,61 kWh
+- AHPSelection: 156,63 kWh
+
+
+ 

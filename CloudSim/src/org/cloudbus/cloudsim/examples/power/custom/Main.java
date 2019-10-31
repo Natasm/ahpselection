@@ -35,8 +35,8 @@ public class Main {
 		boolean outputToFile = false;
 		String inputFile = "testconfig\\all";
 		String outputFolder = "output";
-		String workload = "controlplanetlabconfig.txt"; // PlanetLab workload
-		String vmAllocationPolicy = "mad"; // DVFS policy without VM migrations
+		String workload = "bitbrains.txt"; // PlanetLab workload
+		String vmAllocationPolicy = "thr"; // DVFS policy without VM migrations
 		String vmSelectionPolicy = "ahpselection";
 		String parameter = "0.8";
 
