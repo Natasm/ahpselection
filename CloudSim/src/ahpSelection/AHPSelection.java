@@ -17,28 +17,39 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 	@Override
 	public Vm getVmToMigrate(PowerHost host) {
 		
-		//System.out.print("\n\n------------------------- Nova Seleção ---------------------------------\n\n");
-		
 		List<PowerVm> migratableVms = getMigratableVms(host);
         
 		if (migratableVms.isEmpty() || migratableVms.size() <= 1) return null;
 
+		if (!isServerOverLoaded(host)) return null;
+		
 		Vm vmChoice = choiceVm(host, migratableVms, getCriterionAndSubCriterionWeights());
 
 		return vmChoice;
 	}
+	
+	private boolean isServerOverLoaded(PowerHost host) {
+		boolean is_overloaded = false;
+		
+		if ((host.getUtilizationOfCpu()) >= 0.8) is_overloaded = true;
+		
+		return is_overloaded;
+	}
 
 	public ArrayList<Double> getCriterionAndSubCriterionWeights() {
 		
-	    String labelsCriterion[] = { "Desempenho" , "Utilização" };
-		double compArrayCriterion[] = { 1.0 / 7.0 };
+	    /*String labelsCriterion[] = { "Desempenho" , "Utilização" };
+		double compArrayCriterion[] = { 1.0 / 4.0 };
 
 		String labelsSubCriterion[][] = { { "MIPS ", "RAM" } , { "Utilização da CPU", "Utilização Máxima da CPU" } };
-		double compArraySubCriterion[][] = { { 7.0 } , { 1.0 / 6.0 } };
+		double compArraySubCriterion[][] = { { 2.0 } , { 1.0 / 3.0 } };*/
 
+		String labelsCriterion[] = { "MIPS" ,"Utilização da Cpu" };
+		double compArrayCriterion[] = { 1.0 / 4.0 };
+		
 		PriorityWeights priorityWeights = new PriorityWeights();
-		return priorityWeights.buildPriorityWeights(labelsCriterion, compArrayCriterion, labelsSubCriterion,
-				compArraySubCriterion);
+		return priorityWeights.buildPriorityWeights(labelsCriterion, compArrayCriterion, null,
+				null);
 	}
 
 	public Vm choiceVm(PowerHost host, List<PowerVm> migratableVms, ArrayList<Double> weightsCriterionAndSub) {
@@ -68,40 +79,19 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 		if (i == 0) {
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
-					compArrayVms[i][j] = classifier(migratableVms.get(x).getMips(), 
+					compArrayVms[i][j] = classifierMin(migratableVms.get(x).getMips(), 
 							                        migratableVms.get(y).getMips(),
-							                        host.getTotalMips());
+							                        host.getMaxAvailableMips());
 					j++;
 				}
 		}
-		if (i == 1) {
-			for (x = 0; x < migratableVms.size(); x++)
-				for (y = x + 1; y < migratableVms.size(); y++) {
-					compArrayVms[i][j] = classifier(migratableVms.get(x).getRam(), 
-							                        migratableVms.get(y).getRam(),
-							                        host.getTotalMips());
-					j++;
-				}
-		}
-		if (i == 2) 
-		{
-			for (x = 0; x < migratableVms.size(); x++)
-				for (y = x + 1; y < migratableVms.size(); y++) {
-					double timeX = migratableVms.get(x).getPreviousTime();
-					double timeY = migratableVms.get(y).getPreviousTime();
-					double utilizationX = migratableVms.get(x).getTotalUtilizationOfCpu(timeX);
-					double utilizationY = migratableVms.get(y).getTotalUtilizationOfCpu(timeY);
-					compArrayVms[i][j] = classifier(utilizationX, utilizationY, 1);
-					j++;
-				}
-		}
-		if (i == 3) 
+		if (i == 1) 
 		{
 			for (x = 0; x < migratableVms.size(); x++)
 				for (y = x + 1; y < migratableVms.size(); y++) {
 					compArrayVms[i][j] = classifier(migratableVms.get(x).getCurrentRequestedMaxMips(),
 							                        migratableVms.get(y).getCurrentRequestedMaxMips(),
-							                        host.getTotalMips());
+							                        host.getMaxAvailableMips());
 					j++;
 				}
 		}
@@ -116,26 +106,22 @@ public class AHPSelection extends PowerVmSelectionPolicy {
 	}
 
 	public double classifier(double x, double y, double maxCapacityHost) {
-		double classifier = classifierMin(x, y, maxCapacityHost);
-		if (x < y)
-			return 1 / classifier;
-		else
-			return classifier;
+		return 1.0 / classifierMin(x, y, maxCapacityHost);
 	}
 
 	public double classifierMin(double x, double y, double maxCapacityHost) {
 
-		double res = x + y + maxCapacityHost;
+		double res = x - y + maxCapacityHost;
 		int i;
 
 		if (res > maxCapacityHost) {
-			for (i = 1; i <= 9; i++)
-				if (res < (maxCapacityHost + (i * maxCapacityHost / 8)))
+			for (i = 1; i <= 8; i++)
+				if (res < (maxCapacityHost + (i * maxCapacityHost / 8.0 )))
 					return (i + 1);
 		} else if (res < maxCapacityHost) {
-			for (i = 1; i <= 9; i++)
-				if (res < (i * maxCapacityHost / 8))
-					return 1 / (10 - i);
+			for (i = 1; i <= 8; i++)
+				if (res < (i * maxCapacityHost / 8.0 ))
+					return 1.0 / (10.0 - i);
 		}
 		return 1;
 	}
